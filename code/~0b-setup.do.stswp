@@ -1,0 +1,55 @@
+
+//----------------------------------------------------------------//
+//Setup
+//----------------------------------------------------------------//
+
+//Includes macros for :
+//(i) working directories by users, 
+//(ii) do files, 
+//(iii) raw data files, 
+///(iv) work-in-progress files
+
+
+set more off 
+clear all
+
+*(i)* Working directories by user
+
+	if "`c(username)'" == "mhf221" { 
+		global root "/Users/mhf221/Dropbox\EUTO\09. Global Data Repository\
+		08. profit shifting\stata-project-profit-shifting"				//	Matt HKS computer
+	}
+
+	else if "`c(username)'" == "Matthew Fisher-Post" {
+		global root "D:/Dropbox\EUTO\09. Global Data Repository\
+		08. profit shifting\stata-project-profit-shifting"				//	Matt computer
+	}
+
+	else if "`c(username)'"=="bachas" { 								// Pierre's Mac
+		global root "/Users/bachas/Dropbox\EUTO\09. Global Data Repository\
+		08. profit shifting\stata-project-profit-shifting"									
+	}
+
+	else if "`c(username)'"=="...[Gabriel computer name]..." { 			// Gabriel
+		global root "/Users/...[Gabriel P&D Dropbox name].../Dropbox\EUTO\
+		09. Global Data Repository\08. profit shifting\stata-project-profit-shifting"									
+	}
+			
+	else if "`c(username)'"=="i.gidron" { 								// Idann
+		global root "C:\Users\i.gidron\Dropbox\EUTO\09. Global Data Repository\
+		08. profit shifting\stata-project-profit-shifting"
+	}
+
+//TO DO// Add Ludvig
+			
+cd "$root"
+			
+			
+*(ii)* Macro do files
+global code "$root/code"
+
+*(iii)* Macro raw data files
+global rawdata "$root/raw-data"
+
+*(iv)* Macro work-in-progress files
+global work "$root/work"	

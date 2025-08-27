@@ -1,0 +1,152 @@
+//----------------------------------------
+//Step 1: BOP statistcs from IMF 
+//----------------------------------------
+	
+//IMF BOP data is used to calculate the FDI income of countries
+//It is used in the second part of the analysis to identify high-risk exports
+//Also used in the first part to correct the global imbalance in FDI statistics 	
+
+
+*(i)*
+//we begin by doing the bulk download of all BOP items in all years and all countries from the IMF
+//this implies going online on IMF BOP statistics and pressing "bulk download"
+//that way you obtain the most recent version of IMF BOP data
+
+import delimited "$rawdata/BOP_11-17-2023 07-23-06-02_timeSeries", delimiter(",") clear 		
+rename countryname n_country
+
+//Stata can't read a variable name that is a number, so we recode it
+//Note: your variable names (v1 v2 etc) might take different names depending on your bulk download
+
+	rename v82 year2016
+	rename v83 year2017
+	rename v84 year2018
+	rename v85 year2019	
+	rename v86 year2020
+	rename v87 year2021
+	rename v88 year202
+
+//replace missing values by 0 to enable destring command
+
+	drop if attribute=="Official BPM6" 
+
+	replace year$temp="0" if year$temp==""
+	
+	destring year$temp, replace ignore(",") force
+
+
+//dropping info we don't need
+
+	drop if attribute!="Value"
+
+	keep year$temp n_country countrycode indicatorname indicatorcode attribute
+
+
+	gen account=substr(indicatorname,1,9)
+
+	drop if account !="Current A"
+
+*(ii)*
+//we now make several data transformations
+//this is to ensure data is structured as needed for subsequent computations 
+
+
+keep if (indicatorname=="Current Account, Primary Income, Net, US Dollars"|indicatorname=="Current Account, Primary Income, Debit, US Dollars" |indicatorname=="Current Account, Primary Income, Credit, US Dollars"|indicatorname=="Current Account, Goods and Services, Credit, US Dollars"|indicatorname=="Current Account, Goods and Services, Debit, US Dollars"|indicatorname=="Current Account, Goods and Services, Goods, Credit, US Dollars"|indicatorname=="Current Account, Goods and Services, Goods, Debit, US Dollars"|indicatorname=="Current Account, Goods and Services, Goods, Net, US Dollars"|indicatorname=="Current Account, Goods and Services, Net, US Dollars"|indicatorname=="Current Account, Goods and Services, Services, Credit, US Dollars"|indicatorname=="Current Account, Goods and Services, Services, Debit, US Dollars"|indicatorname=="Current Account, Goods and Services, Services, Net, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Net, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Dividends and Withdrawals from Income of Quasi-Corporations, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Dividends and Withdrawals from Income of Quasi-Corporations, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Dividends and Withdrawals from Income of Quasi-Corporations, Net, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Reinvested Earnings, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Reinvested Earnings, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Reinvested Earnings, Net, US Dollars" |indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Interest, Net, US Dollars" |indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Interest, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Interest, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Other Investment, Interest, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Other Investment, Interest, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Other Investment, Interest, Net, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Interest, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Interest, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Interest, Net, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Investment Income on Equity and Investment Fund Shares, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Investment Income on Equity and Investment Fund Shares, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Investment Income on Equity and Investment Fund Shares, Net, US Dollars" |indicatorname=="Current Account, Secondary Income, Financial Corporations, Nonfinancial Corporations, Households, and NPISHs, Credit, US Dollars"|indicatorname=="Current Account, Secondary Income, Financial Corporations, Nonfinancial Corporations, Households, and NPISHs, Debit, US Dollars"|indicatorname=="Current Account, Secondary Income, Financial Corporations, Nonfinancial Corporations, Households, and NPISHs, Net, US Dollars" |indicatorname=="Current Account, Secondary Income, Credit, US Dollars"|indicatorname=="Current Account, Secondary Income, Debit, US Dollars"|indicatorname=="Current Account, Secondary Income, Net, US Dollars" |indicatorname=="Current Account, Total, Credit, US Dollars"|indicatorname=="Current Account, Total, Debit, US Dollars"|indicatorname=="Current Account, Total, Net, US Dollars" |indicatorname=="Current Account, Primary Income, Other Primary Income, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Other Primary Income, Debit, US Dollars" |indicatorname=="Current Account, Primary Income, Other Primary Income, Net, US Dollars" |indicatorname=="Current Account, Goods and Services, Credit, US Dollars" |indicatorname=="Current Account, Goods and Services, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Compensation of Employees, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Compensation of Employees, Net, US Dollars"  |indicatorname=="Current Account, Primary Income, Compensation of Employees, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Compensation of Employees, Net, US Dollars" |indicatorname=="Current Account, Primary Income, Investment Income, Credit, US Dollars" |indicatorname=="Current Account, Primary Income, Investment Income, Net, US Dollars" |indicatorname=="Current Account, Primary Income, Investment Income, Debit, US Dollars" |indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Credit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Debit, US Dollars"|indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Net, US Dollars")
+
+
+gen id=_n
+
+reshape long year, i(id) j(y)
+
+drop attribute
+rename year USD
+
+
+
+replace indicatorname="DI_interest_Net" if indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Interest, Net, US Dollars" 
+
+foreach x in "Net" "Credit" "Debit"{
+	replace indicatorname="primaryinc_`x'" if indicatorname=="Current Account, Primary Income, `x', US Dollars"
+	replace indicatorname="totaltrade_`x'" if indicatorname=="Current Account, Goods and Services, `x', US Dollars"
+	replace indicatorname="goods_`x'" if indicatorname=="Current Account, Goods and Services, Goods, `x', US Dollars"
+	replace indicatorname="services_`x'" if indicatorname=="Current Account, Goods and Services, Services, `x', US Dollars"
+	replace indicatorname="DI_grossprof_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, `x', US Dollars"
+	replace indicatorname="DI_divd_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Dividends and Withdrawals from Income of Quasi-Corporations, `x', US Dollars"
+	replace indicatorname="DI_reinvested_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Income on Equity and Investment Fund Shares, Reinvested Earnings, `x', US Dollars"
+	replace indicatorname="DI_interest_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, Interest, `x', US Dollars"
+	replace indicatorname="PI_divd_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Investment Income on Equity and Investment Fund Shares, `x', US Dollars"
+	replace indicatorname="PI_interest_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Portfolio Investment, Interest, `x', US Dollars"
+	replace indicatorname="Other_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Other Investment, Interest, `x', US Dollars"
+	replace indicatorname="SI_corpandhh_`x'" if indicatorname=="Current Account, Secondary Income, Financial Corporations, Nonfinancial Corporations, Households, and NPISHs, `x', US Dollars"
+	replace indicatorname="SI_total_`x'" if indicatorname=="Current Account, Secondary Income, `x', US Dollars"
+	replace indicatorname="CA_total_`x'" if indicatorname=="Current Account, Total, `x', US Dollars"
+	replace indicatorname="Primaryincome_Other_`x'" if indicatorname=="Current Account, Primary Income, Other Primary Income, `x', US Dollars"
+	replace indicatorname="CompensationEmployees_`x'" if indicatorname=="Current Account, Primary Income, Compensation of Employees, `x', US Dollars"
+	replace indicatorname="TotalInvest_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, `x', US Dollars"
+	replace indicatorname="TotalDI_`x'" if indicatorname=="Current Account, Primary Income, Investment Income, Direct Investment, `x', US Dollars"
+	}
+
+
+
+	
+	
+drop indicatorcode id
+egen idw=group(y countrycode)
+
+reshape wide USD, i(idw) j(indicatorname) string
+
+rename y year
+
+foreach name in primaryinc_Net primaryinc_Credit primaryinc_Debit TotalDI_Debit 	 ///
+TotalDI_Net TotalDI_Credit TotalInvest_Credit TotalInvest_Net TotalInvest_Debit 	 ///
+CompensationEmployees_Debit CompensationEmployees_Net CompensationEmployees_Credit 	 ///
+Primaryincome_Other_Credit Primaryincome_Other_Debit Primaryincome_Other_Net 		 ///
+CA_total_Credit CA_total_Debit CA_total_Net DI_divd_Credit DI_divd_Debit DI_divd_Net /// 
+DI_grossprof_Credit DI_grossprof_Debit DI_grossprof_Net DI_interest_Credit 			 ///
+DI_interest_Debit DI_interest_Net DI_reinvested_Credit DI_reinvested_Debit 			 ///
+DI_reinvested_Net Other_Credit Other_Debit Other_Net PI_divd_Credit PI_divd_Debit 	 ///
+PI_divd_Net PI_interest_Credit PI_interest_Debit PI_interest_Net SI_corpandhh_Credit /// 
+SI_corpandhh_Debit SI_corpandhh_Net SI_total_Credit SI_total_Debit SI_total_Net 	 ///
+goods_Credit goods_Debit goods_Net services_Credit services_Debit services_Net 		 ///
+totaltrade_Credit totaltrade_Debit totaltrade_Net {
+	rename USD`name' `name'
+}
+
+
+gen EU=(n_cou=="Belgium"	|n_cou=="Bulgaria"	|n_cou=="Czech Republic"		///
+|n_cou=="Denmark"	|n_cou=="Germany"	|n_cou=="Estonia"	|n_cou=="Ireland"	///
+|n_cou=="Greece"	|n_cou=="Spain"	|n_cou=="France"	|n_cou=="Croatia"		///
+|n_cou=="Italy"	|n_cou=="Cyprus"	|n_cou=="Latvia"	|n_cou=="Lithuania"		///
+|n_cou=="Luxembourg"	|n_cou=="Hungary"	|n_cou=="Malta"						///
+|n_cou=="Netherlands"	|n_cou=="Austria"	|n_cou=="Poland"					///
+|n_cou=="Portugal"	|n_cou=="Romania"	|n_cou=="Slovenia"	|n_cou=="Slovakia"	///
+|n_cou=="Finland"	|n_cou=="Sweden"	|n_cou=="United Kingdom")
+
+
+//we now have our basic data:
+save "$work/IMF_BOP_$temp", replace
+use "$work/IMF_BOP_$temp", replace
+
+*(iii)*
+//in this final step we save specifc variables in different data files
+//this ensures smooth use of BOP data at later stages
+
+drop if n_cou=="EU high risk countries"|n_cou=="EU22"|n_cou=="Eastern Caribbean Currency Union"|n_cou=="Euro Area"
+
+kountry country, from(imfn) to(iso3c)	
+
+//Total DI credit and debit
+
+preserve 
+keep n_country _ISO3C_ TotalDI_Credit TotalDI_Debit
+order n_country _ISO3C_ TotalDI_Credit TotalDI_Debit
+save "$work/IMF_fdi_credit_debitinc_$temp", replace
+restore
+
+//Total DI interest
+
+preserve
+keep n_country _ISO3C_ DI_interest_Net DI_interest_Credit DI_interest_Debit
+order n_country _ISO3C_ DI_interest_Net DI_interest_Credit DI_interest_Debit
+save "$work/IMF_fdi_interest_$temp", replace
+restore

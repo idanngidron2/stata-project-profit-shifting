@@ -1,0 +1,78 @@
+#R code to import OECD data after OECD shift to data explorer in 2024
+#This R script uploads OECD BOP data, as descibed in OECD BOP Disc.do
+
+
+#install.packages("rsdmx")
+#install.packages("httr")
+#install.packages("jsonlite")
+#install.packages("dplyr")  # For data manipulation
+
+#set working directory#
+
+setwd("C:/Users/i.gidron/Dropbox/EUTO/09. Atlas of Offshore World/08. profit shifting/stata-project-profit-shifting/raw-data")
+
+# Load necessary libraries
+library(rsdmx)
+library(dplyr)
+
+#-------------
+#OECD BOP data
+#-------------
+
+# Define the OECD API endpoint
+#2022-2023
+
+url <- "https://sdmx.oecd.org/public/rest/data/OECD.DAF.INV,DSD_FDI@DF_FDI_INC_CTRY,1.0/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+MEX+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+TUR+CHE+LUX+NLD+GBR+USA.T_D4P_F.USD_EXC.DO+DI..ALL...W+W_X+OECD00+E+F+A+S+O+EU27_2020+EU28+EU27+EU25+EU15+ASEAN+G20XEU+G20OECD+G20XOECD+F98+ODA+ODAE+ODAF+ODAA+ODAS+ODAO+AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+ALB+AND+BLR+BIH+BGR+HRV+CYP+FRO+GIB+VAT+IMN+XKV+LIE+MKD+MLT+MDA+MNE+ROU+RUS+SMR+SRB+SCG_F+UKR+EXOECD+DZA+EGY+LBY+MAR+TUN+AGO+BEN+BWA+IOT+BFA+BDI+CMR+CPV+CAF+TCD+COM+COG+COD+CIV+DJI+GNQ+ERI+ETH+GAB+GMB+GHA+GIN+GNB+KEN+LSO+LBR+MDG+MWI+MLI+MRT+MUS+MOZ+NAM+NER+NGA+RWA+SHN+STP+SEN+SYC+SLE+SOM+ZAF+SSD+SDN+SWZ+TZA+TGO+UGA+ZMB+ZWE+F4+F_O+GRL+AIA+ATG+ABW+BHS+BRB+BLZ+BES+CYM+CUB+CUW+DMA+DOM+SLV+GRD+GTM+HTI+HND+JAM+MSR+ANT_F+NIC+PAN+KNA+LCA+VCT+SXM+TTO+TCA+VGB+VIR+A5XOECD+ARG+BOL+BRA+ECU+FLK+GUY+PRY+PER+SUR+URY+VEN+A2+A5+A7+BHR+IRQ+KWT+OMN+QAT+SAU+ARE+YEM+ARM+AZE+GEO+JOR+LBN+PSE+SYR+GULF+S3_O+AFG+BGD+BTN+BRN+KHM+CHN+HKG+IND+IDN+IRN+KAZ+PRK+KGZ+LAO+MAC+MYS+MDV+MNG+MMR+NPL+PAK+PHL+SGP+LKA+TWN+TJK+THA+TLS+TKM+UZB+VNM+S3+S_O+ASM+ATA+BVT+CXR+CCK+COK+FJI+PYF+ATF+GUM+HMD+KIR+MHL+FSM+NRU+NCL+NIU+NFK+MNP+PLW+PNG+PCN+WSM+SLB+SGS+TKL+TON+TUV+UMI+VUT+WLF+GGY+BMU+JEY.IMC..A.?startPeriod=2022&dimensionAtObservation=AllDimensions"
+
+#BUlk:2016-2023
+url <- "https://sdmx.oecd.org/public/rest/data/OECD.DAF.INV,DSD_FDI@DF_FDI_INC_CTRY,1.0/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+MEX+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+TUR+CHE+LUX+NLD+GBR+USA.T_D4P_F.USD_EXC.DO+DI..ALL...W+W_X+OECD00+E+F+A+S+O+EU27_2020+EU28+EU27+EU25+EU15+ASEAN+G20XEU+G20OECD+G20XOECD+F98+ODA+ODAE+ODAF+ODAA+ODAS+ODAO+AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+ALB+AND+BLR+BIH+BGR+HRV+CYP+FRO+GIB+VAT+IMN+XKV+LIE+MKD+MLT+MDA+MNE+ROU+RUS+SMR+SRB+SCG_F+UKR+EXOECD+DZA+EGY+LBY+MAR+TUN+AGO+BEN+BWA+IOT+BFA+BDI+CMR+CPV+CAF+TCD+COM+COG+COD+CIV+DJI+GNQ+ERI+ETH+GAB+GMB+GHA+GIN+GNB+KEN+LSO+LBR+MDG+MWI+MLI+MRT+MUS+MOZ+NAM+NER+NGA+RWA+SHN+STP+SEN+SYC+SLE+SOM+ZAF+SSD+SDN+SWZ+TZA+TGO+UGA+ZMB+ZWE+F4+F_O+GRL+AIA+ATG+ABW+BHS+BRB+BLZ+BES+CYM+CUB+CUW+DMA+DOM+SLV+GRD+GTM+HTI+HND+JAM+MSR+ANT_F+NIC+PAN+KNA+LCA+VCT+SXM+TTO+TCA+VGB+VIR+A5XOECD+ARG+BOL+BRA+ECU+FLK+GUY+PRY+PER+SUR+URY+VEN+A2+A5+A7+BHR+IRQ+KWT+OMN+QAT+SAU+ARE+YEM+ARM+AZE+GEO+JOR+LBN+PSE+SYR+GULF+S3_O+AFG+BGD+BTN+BRN+KHM+CHN+HKG+IND+IDN+IRN+KAZ+PRK+KGZ+LAO+MAC+MYS+MDV+MNG+MMR+NPL+PAK+PHL+SGP+LKA+TWN+TJK+THA+TLS+TKM+UZB+VNM+S3+S_O+ASM+ATA+BVT+CXR+CCK+COK+FJI+PYF+ATF+GUM+HMD+KIR+MHL+FSM+NRU+NCL+NIU+NFK+MNP+PLW+PNG+PCN+WSM+SLB+SGS+TKL+TON+TUV+UMI+VUT+WLF+GGY+BMU+JEY.IMC..A.?startPeriod=2016&dimensionAtObservation=AllDimensions"
+
+# Fetch the data using rsdmx
+sdmx_data <- readSDMX(url)
+
+# Convert to a data frame
+data <- as.data.frame(sdmx_data)
+
+# View the first few rows of the dataset
+head(data)
+
+write.csv(data, "OECD_BOP_2022.csv", row.names = FALSE)
+write.csv(data, "OECD_BOP_2021.csv", row.names = FALSE)
+write.csv(data, "OECD_BOP_BULK_2016-2023.csv", row.names = FALSE)
+
+
+#----------------------
+#OECD TAX Revenue data
+#----------------------
+
+url_rev <- "https://sdmx.oecd.org/public/rest/data/OECD.CTP.TPS,DSD_REV_COMP_OECD@DF_RSOECD,/AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+ISL+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NLD+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+OECD_REP+FEDOECD+UNIOECD..S13.T_1220+T_1210+T_1200..USD.A?startPeriod=2016&endPeriod=2023&dimensionAtObservation=AllDimensions"
+
+# Fetch the data using rsdmx
+sdmx_data_rev <- readSDMX(url_rev)
+
+# Convert to a data frame
+data_rev <- as.data.frame(sdmx_data_rev)
+
+# View the first few rows of the dataset
+head(data_rev)
+
+write.csv(data_rev, "OECD_REV_2016_2023.csv", row.names = FALSE)
+
+#----------------------
+#OECD SNA Table 14a
+#----------------------
+
+url_sna_tab14a <- "https://sdmx.oecd.org/public/rest/data/OECD.SDD.NAD,DSD_NASEC10@DF_TABLE14,/A.AUS+AUT+BEL+CAN+CHL+COL+CRI+CZE+DNK+EST+FIN+FRA+DEU+GRC+HUN+IRL+ISR+ITA+JPN+KOR+LVA+LTU+LUX+MEX+NZL+NOR+POL+PRT+SVK+SVN+ESP+SWE+CHE+TUR+GBR+USA+EA20+EU27_2020+BRA+CHN+HRV+ROU+RUS+ZAF+NLD.S11+S12+S1...D44+D7+P51C+D41+D1+B1G+B2G._Z....V..?startPeriod=2016&endPeriod=2023&dimensionAtObservation=AllDimensions"
+
+# Fetch the data using rsdmx
+sdmx_data_sna_tab14a <- readSDMX(url_sna_tab14a)
+
+# Convert to a data frame
+data_sna_tab14a <- as.data.frame(sdmx_data_sna_tab14a)
+
+# View the first few rows of the dataset
+head(data_sna_tab14a)
+
+write.csv(data_sna_tab14a, "OECD_SNA_Tab14a_2016_2023.csv", row.names = FALSE)
+
+
