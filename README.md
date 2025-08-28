@@ -14,8 +14,7 @@ The project includes:
 
 ## Resources  
 - **User Guide** → step-by-step instructions on running the code and structuring the project available here: [Gidron, Wier, and Zucman (2025)](https://atlas-offshore-world.org/download-data/).
-- **Methodology Paper** → detailed explanation of the approach used in the calculations  
-- **Stata Project File (`.stpr`)** → we recommend building a project file and organizing the `.do` files as in `stata-project-shifting.stpr`  
+- **Pro tip** → we recommend building a project file and organizing the `.do` files as in `stata-project-shifting.stpr`  
 
 ---
 
