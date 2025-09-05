@@ -13,7 +13,7 @@ The project includes:
 ---
 
 ## Resources  
-- **User Guide** → step-by-step instructions on running the code and structuring the project available here: [Gidron, Wier, and Zucman (2025)](https://atlas-offshore-world.org/download-data/).
+- **User Guide** → step-by-step instructions on running the code and structuring the project available here: [User guide](https://atlas-offshore-world.org/download-data/).
 - **Pro tip** → we recommend building a project file and organizing the `.do` files as in `stata-project-shifting.stpr`  
 
 ---
