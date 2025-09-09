@@ -13,7 +13,7 @@ The project includes:
 ---
 
 ## Resources  
-- **User Guide** → step-by-step instructions on running the code and structuring the project available here: [User guide](https://atlas-offshore-world.org/download-data/).
+- **User Guide** → step-by-step instructions on running the code and structuring the project available here: [User guide](https://www.dropbox.com/scl/fi/xup85x103aoofl06nmdld/Profit_shifting_methodology_july_2025.pdf?rlkey=o0cidk4w335i0qg1efowy78ga&st=mqozhpo9&raw=1).
 - **Pro tip** → we recommend building a project file and organizing the `.do` files as in `stata-project-shifting.stpr`  
 
 ---
